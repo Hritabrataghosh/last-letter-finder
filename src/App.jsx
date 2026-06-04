@@ -12,15 +12,19 @@ import {
   searchTraps
 } from "./utils/searchEngine";
 
+import {
+  searchSpamWords
+} from "./utils/spamSearch";
+
 import trap3Data from "./data/trap3.json";
 import trap4Data from "./data/trap4.json";
 
 export default function App() {
 
-  const [words, setWords] =
+  const [words,setWords] =
     useState([]);
 
-  const [query, setQuery] =
+  const [query,setQuery] =
     useState("");
 
   const [normalResults,
@@ -35,9 +39,13 @@ export default function App() {
     setTrap4Results] =
     useState([]);
 
+  const [spamResults,
+    setSpamResults] =
+    useState([]);
+
   useEffect(() => {
 
-    async function initialize() {
+    async function initialize(){
 
       const loadedWords =
         await loadWords();
@@ -50,39 +58,41 @@ export default function App() {
     initialize();
 
   }, []);
+
   useEffect(() => {
 
-  const clearSearch = (e) => {
+    const clearSearch = (e) => {
 
-    if (e.key === "Escape") {
-      setQuery("");
-    }
+      if (e.key === "Escape") {
+        setQuery("");
+      }
 
-  };
+    };
 
-  window.addEventListener(
-    "keydown",
-    clearSearch
-  );
-
-  return () => {
-
-    window.removeEventListener(
+    window.addEventListener(
       "keydown",
       clearSearch
     );
 
-  };
+    return () => {
 
-}, []);
+      window.removeEventListener(
+        "keydown",
+        clearSearch
+      );
+
+    };
+
+  }, []);
 
   useEffect(() => {
 
-    if (query === "") {
+    if(query === ""){
 
       setNormalResults([]);
       setTrap3Results([]);
       setTrap4Results([]);
+      setSpamResults([]);
 
       return;
     }
@@ -111,6 +121,16 @@ export default function App() {
 
       searchTraps(
         trap4Data,
+        query,
+        50
+      )
+
+    );
+
+    setSpamResults(
+
+      searchSpamWords(
+        words,
         query,
         50
       )
@@ -162,11 +182,16 @@ export default function App() {
           }
           trapMode={true}
         />
-        
+
+        <ResultsList
+          title="Spam Endings"
+          results={
+            spamResults
+          }
+        />
 
       </div>
 
     </div>
-
   );
 }
