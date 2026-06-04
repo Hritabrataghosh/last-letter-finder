@@ -1,0 +1,183 @@
+body{
+  margin:0;
+  font-family:Segoe UI,sans-serif;
+  background:#050816;
+  color:white;
+}
+
+.app{
+  max-width:1800px;
+  margin:auto;
+  padding:20px;
+}
+
+.title{
+  text-align:center;
+  font-size:4rem;
+  margin-bottom:20px;
+  letter-spacing:4px;
+  color:#7df9ff;
+  text-shadow:
+    0 0 10px #7df9ff,
+    0 0 25px #7df9ff;
+}
+
+.search-wrapper{
+  position:sticky;
+  top:0;
+  z-index:100;
+  padding:15px;
+  border-radius:20px;
+  margin-bottom:20px;
+
+  backdrop-filter:blur(20px);
+
+  background:
+    rgba(255,255,255,.08);
+
+  border:
+    1px solid
+    rgba(255,255,255,.1);
+}
+
+.search-input{
+  width:100%;
+  padding:18px;
+
+  border:none;
+  outline:none;
+
+  border-radius:15px;
+
+  font-size:1.2rem;
+
+  background:
+    rgba(255,255,255,.08);
+
+  color:white;
+}
+
+.word-count{
+  margin-top:10px;
+  opacity:.8;
+}
+
+.results-layout{
+
+  display:grid;
+
+  grid-template-columns:
+    1fr
+    1fr
+    1fr;
+
+  gap:20px;
+}
+
+.panel{
+
+  height:75vh;
+
+  overflow-y:auto;
+
+  border-radius:20px;
+
+  backdrop-filter:blur(20px);
+
+  background:
+    rgba(255,255,255,.06);
+
+  border:
+    1px solid
+    rgba(255,255,255,.08);
+
+  padding:15px;
+}
+
+.panel-title{
+
+  position:sticky;
+  top:0;
+
+  background:#050816;
+
+  padding:10px;
+
+  font-size:1.4rem;
+
+  font-weight:700;
+
+  color:#7df9ff;
+
+  margin-bottom:15px;
+}
+
+.word-grid{
+
+  display:grid;
+
+  grid-template-columns:
+    repeat(
+      auto-fill,
+      minmax(120px,1fr)
+    );
+
+  gap:8px;
+}
+
+.word-pill{
+
+  padding:10px;
+
+  border-radius:10px;
+
+  text-align:center;
+
+  cursor:pointer;
+
+  transition:.2s;
+
+  background:
+    rgba(125,249,255,.08);
+
+  border:
+    1px solid
+    rgba(125,249,255,.2);
+}
+
+.word-pill:hover{
+
+  transform:
+    translateY(-2px);
+
+  background:
+    rgba(125,249,255,.18);
+
+  box-shadow:
+    0 0 15px
+    rgba(125,249,255,.4);
+}
+
+.panel::-webkit-scrollbar{
+  width:8px;
+}
+
+.panel::-webkit-scrollbar-thumb{
+
+  background:#7df9ff;
+
+  border-radius:10px;
+}
+
+@media(max-width:1200px){
+
+  .results-layout{
+
+    grid-template-columns:
+      1fr;
+  }
+
+  .panel{
+    height:60vh;
+  }
+}
