@@ -168,27 +168,24 @@ export default function App() {
         />
 
         <ResultsList
-          title="3 Letter Traps"
-          results={
-            trap3Results
-          }
-          trapMode={true}
-        />
+  title="3 Letter Traps"
+  results={trap3Results}
+  trapMode={true}
+  collapsible={true}
+/>
 
-        <ResultsList
-          title="4 Letter Traps"
-          results={
-            trap4Results
-          }
-          trapMode={true}
-        />
+<ResultsList
+  title="4 Letter Traps"
+  results={trap4Results}
+  trapMode={true}
+  collapsible={true}
+/>
 
-        <ResultsList
-          title="Spam Endings"
-          results={
-            spamResults
-          }
-        />
+<ResultsList
+  title="Spam Endings"
+  results={spamResults}
+  collapsible={true}
+/>
 
       </div>
 

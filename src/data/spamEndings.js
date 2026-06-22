@@ -11,6 +11,11 @@ export const spamEndings = [
   "cey",
   "aman",
   "king",
-  "ting"
+  "ting",
+
+  "elae",
+  "ades",
+  "dans",
+  "inos"
 
 ];

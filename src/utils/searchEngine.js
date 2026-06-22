@@ -10,7 +10,29 @@ export function searchWords(
   const q =
     query.toLowerCase();
 
-  // ENDS WITH
+  const parts =
+    q.trim().split(/\s+/);
+
+  // s ines
+
+  if (parts.length === 2) {
+
+    const start =
+      parts[0];
+
+    const end =
+      parts[1];
+
+    return words
+      .filter(
+        word =>
+          word.startsWith(start) &&
+          word.endsWith(end)
+      )
+      .slice(0, limit);
+  }
+
+  // " eum"
 
   if (q.startsWith(" ")) {
 
@@ -18,25 +40,31 @@ export function searchWords(
       q.trim();
 
     return words
-      .filter(
-        word =>
-          word.endsWith(
-            suffix
-          )
+  .filter(
+    word =>
+      word.endsWith(
+        suffix
       )
-      .slice(0, limit);
+  )
+  .sort(
+    (a,b) =>
+      a.length - b.length ||
+      a.localeCompare(b)
+  )
+  .slice(0, limit);
   }
 
-  // STARTS WITH
-
   return words
-    .filter(
-      word =>
-        word.startsWith(
-          q
-        )
-    )
-    .slice(0, limit);
+  .filter(
+    word =>
+      word.startsWith(q)
+  )
+  .sort(
+    (a,b) =>
+      a.length - b.length ||
+      a.localeCompare(b)
+  )
+  .slice(0, limit);
 }
 
 export function searchTraps(
@@ -51,7 +79,30 @@ export function searchTraps(
   const q =
     query.toLowerCase();
 
-  // ENDS WITH SEARCH
+  const parts =
+    q.trim().split(/\s+/);
+
+  if (parts.length === 2) {
+
+    const start =
+      parts[0];
+
+    const end =
+      parts[1];
+
+    return words
+  .filter(
+    word =>
+      word.startsWith(start) &&
+      word.endsWith(end)
+  )
+  .sort(
+    (a,b) =>
+      a.length - b.length ||
+      a.localeCompare(b)
+  )
+  .slice(0, limit);
+  }
 
   if (q.startsWith(" ")) {
 
@@ -67,8 +118,6 @@ export function searchTraps(
       )
       .slice(0, limit);
   }
-
-  // STARTS WITH SEARCH
 
   return traps
     .filter(
