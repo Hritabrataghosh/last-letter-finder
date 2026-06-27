@@ -1,21 +1,35 @@
 export const spamEndings = [
 
-  "ters",
-  "ally",
-  "ler",
-  "acal",
-  "raph",
-  "aran",
-  "tome",
-  "erio",
-  "cey",
-  "aman",
-  "king",
-  "ting",
+    "ters",
 
-  "elae",
-  "ades",
-  "dans",
-  "inos"
+    "ally",
+
+    "ler",
+
+    "acal",
+
+    "raph",
+
+    "aran",
+
+    "tome",
+
+    "erio",
+
+    "cey",
+
+    "aman",
+
+    "king",
+
+    "ting",
+
+    "elae",
+
+    "ades",
+
+    "dans",
+
+    "inos"
 
 ];

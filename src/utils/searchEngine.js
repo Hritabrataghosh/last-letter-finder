@@ -1,130 +1,209 @@
+function sortWords(words) {
+
+    return words.sort((a, b) => {
+
+        if (a.length !== b.length)
+            return a.length - b.length;
+
+        return a.localeCompare(b);
+
+    });
+
+}
+
+function sortTraps(traps) {
+
+    return traps.sort((a, b) => {
+
+        if (a.word.length !== b.word.length)
+            return a.word.length - b.word.length;
+
+        return a.word.localeCompare(b.word);
+
+    });
+
+}
+
+function parseQuery(query) {
+
+    const raw = query.toLowerCase();
+
+    if (!raw.trim())
+        return null;
+
+    // Leading space = suffix search
+    if (raw.startsWith(" ")) {
+
+        return {
+            mode: "suffix",
+            suffix: raw.trim()
+        };
+
+    }
+
+    // start end
+    const parts = raw.trim().split(/\s+/);
+
+    if (parts.length === 2) {
+
+        return {
+
+            mode: "both",
+
+            start: parts[0],
+
+            end: parts[1]
+
+        };
+
+    }
+
+    return {
+
+        mode: "prefix",
+
+        prefix: raw.trim()
+
+    };
+
+}
+
 export function searchWords(
-  words,
-  query,
-  limit = 50
+    words,
+    query,
+    limit = 50
 ) {
 
-  if (!query)
-    return [];
+    const parsed =
+        parseQuery(query);
 
-  const q =
-    query.toLowerCase();
+    if (!parsed)
+        return [];
 
-  const parts =
-    q.trim().split(/\s+/);
+    let results = [];
 
-  // s ines
+    switch (parsed.mode) {
 
-  if (parts.length === 2) {
+        case "prefix":
 
-    const start =
-      parts[0];
+            results =
+                words.filter(
 
-    const end =
-      parts[1];
+                    word =>
+                        word.startsWith(
+                            parsed.prefix
+                        )
 
-    return words
-      .filter(
-        word =>
-          word.startsWith(start) &&
-          word.endsWith(end)
-      )
-      .slice(0, limit);
-  }
+                );
 
-  // " eum"
+            break;
 
-  if (q.startsWith(" ")) {
+        case "suffix":
 
-    const suffix =
-      q.trim();
+            results =
+                words.filter(
 
-    return words
-  .filter(
-    word =>
-      word.endsWith(
-        suffix
-      )
-  )
-  .sort(
-    (a,b) =>
-      a.length - b.length ||
-      a.localeCompare(b)
-  )
-  .slice(0, limit);
-  }
+                    word =>
+                        word.endsWith(
+                            parsed.suffix
+                        )
 
-  return words
-  .filter(
-    word =>
-      word.startsWith(q)
-  )
-  .sort(
-    (a,b) =>
-      a.length - b.length ||
-      a.localeCompare(b)
-  )
-  .slice(0, limit);
+                );
+
+            break;
+
+        case "both":
+
+            results =
+                words.filter(
+
+                    word =>
+
+                        word.startsWith(
+                            parsed.start
+                        ) &&
+
+                        word.endsWith(
+                            parsed.end
+                        )
+
+                );
+
+            break;
+
+    }
+
+    return sortWords(results)
+        .slice(0, limit);
+
 }
 
 export function searchTraps(
-  traps,
-  query,
-  limit = 50
+    traps,
+    query,
+    limit = 50
 ) {
 
-  if (!query)
-    return [];
+    const parsed =
+        parseQuery(query);
 
-  const q =
-    query.toLowerCase();
+    if (!parsed)
+        return [];
 
-  const parts =
-    q.trim().split(/\s+/);
+    let results = [];
 
-  if (parts.length === 2) {
+    switch (parsed.mode) {
 
-    const start =
-      parts[0];
+        case "prefix":
 
-    const end =
-      parts[1];
+            results =
+                traps.filter(
 
-    return words
-  .filter(
-    word =>
-      word.startsWith(start) &&
-      word.endsWith(end)
-  )
-  .sort(
-    (a,b) =>
-      a.length - b.length ||
-      a.localeCompare(b)
-  )
-  .slice(0, limit);
-  }
+                    trap =>
+                        trap.word.startsWith(
+                            parsed.prefix
+                        )
 
-  if (q.startsWith(" ")) {
+                );
 
-    const suffix =
-      q.trim();
+            break;
 
-    return traps
-      .filter(
-        trap =>
-          trap.word.endsWith(
-            suffix
-          )
-      )
-      .slice(0, limit);
-  }
+        case "suffix":
 
-  return traps
-    .filter(
-      trap =>
-        trap.word.startsWith(
-          q.trim()
-        )
-    )
-    .slice(0, limit);
+            results =
+                traps.filter(
+
+                    trap =>
+                        trap.word.endsWith(
+                            parsed.suffix
+                        )
+
+                );
+
+            break;
+
+        case "both":
+
+            results =
+                traps.filter(
+
+                    trap =>
+
+                        trap.word.startsWith(
+                            parsed.start
+                        ) &&
+
+                        trap.word.endsWith(
+                            parsed.end
+                        )
+
+                );
+
+            break;
+
+    }
+
+    return sortTraps(results)
+        .slice(0, limit);
+
 }

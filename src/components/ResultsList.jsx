@@ -1,148 +1,198 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function ResultsList({
-  title,
-  results,
-  trapMode = false,
-  collapsible = false
-}) {
 
-  const [open, setOpen] =
-    useState(false);
+    title,
 
-  const handleCopy = (
-    text
-  ) => {
+    results,
 
-    navigator.clipboard
-      .writeText(text);
-  };
+    trapMode = false,
 
-  if (collapsible) {
+    collapsible = false
 
-    return (
+}){
 
-      <div className="accordion">
+    const [open,setOpen] =
+        useState(false);
 
-        <div
-          className="accordion-header"
-          onClick={() =>
-            setOpen(
-              !open
-            )
-          }
-        >
+    const [copied,setCopied] =
+        useState("");
 
-          {open
-            ? "▼ "
-            : "▶ "}
+    useEffect(()=>{
 
-          {title}
-          {" "}
-          ({results.length})
+        if(copied==="")
+            return;
 
-        </div>
+        const timer =
+            setTimeout(()=>{
 
-        {open && (
+                setCopied("");
 
-          <div
-            className="accordion-content"
-          >
+            },1200);
+
+        return ()=>clearTimeout(timer);
+
+    },[copied]);
+
+    const copyWord = async(word)=>{
+
+        try{
+
+            await navigator.clipboard.writeText(word);
+
+            setCopied(word);
+
+        }
+
+        catch{
+
+        }
+
+    };
+
+    const renderWord = (item)=>{
+
+        const word =
+            trapMode
+            ? item.word
+            : item;
+
+        return(
 
             <div
-              className="word-grid"
+
+                key={word}
+
+                className="word-pill"
+
+                onClick={()=>copyWord(word)}
+
             >
 
-              {results.map(
-                (
-                  item,
-                  index
-                ) => {
+                <div className="word-text">
 
-                  const word =
-                    trapMode
-                    ? item.word
-                    : item;
+                    {word}
 
-                  return (
+                </div>
 
-                    <div
-                      key={index}
-                      className="word-pill"
-                      onClick={() =>
-                        handleCopy(
-                          word
-                        )
-                      }
-                    >
+                {
 
-                      {word}
+                    trapMode &&
+
+                    <div className="trap-info">
+
+                        {item.type==="self"
+                            ? "SELF"
+                            : item.trap}
 
                     </div>
 
-                  );
                 }
-              )}
+
+                {
+
+                    copied===word &&
+
+                    <div className="copied">
+
+                        Copied
+
+                    </div>
+
+                }
 
             </div>
 
-          </div>
+        );
 
-        )}
+    };
 
-      </div>
+    if(collapsible){
+
+        return(
+
+            <div className="accordion">
+
+                <div
+
+                    className="accordion-header"
+
+                    onClick={()=>setOpen(!open)}
+
+                >
+
+                    <span>
+
+                        {open?"▼":"▶"}
+
+                    </span>
+
+                    <span>
+
+                        {title}
+
+                    </span>
+
+                    <span>
+
+                        {results.length}
+
+                    </span>
+
+                </div>
+
+                {
+
+                    open &&
+
+                    <div className="accordion-content">
+
+                        <div className="word-grid">
+
+                            {
+
+                                results.map(renderWord)
+
+                            }
+
+                        </div>
+
+                    </div>
+
+                }
+
+            </div>
+
+        );
+
+    }
+
+    return(
+
+        <div className="panel">
+
+            <div className="panel-title">
+
+                {title}
+
+                {" "}
+
+                ({results.length})
+
+            </div>
+
+            <div className="word-grid">
+
+                {
+
+                    results.map(renderWord)
+
+                }
+
+            </div>
+
+        </div>
 
     );
-  }
 
-  return (
-
-    <div className="panel">
-
-      <div className="panel-title">
-
-        {title}
-        {" "}
-        ({results.length})
-
-      </div>
-
-      <div className="word-grid">
-
-        {results.map(
-          (
-            item,
-            index
-          ) => {
-
-            const word =
-              trapMode
-              ? item.word
-              : item;
-
-            return (
-
-              <div
-                key={index}
-                className="word-pill"
-                onClick={() =>
-                  handleCopy(
-                    word
-                  )
-                }
-              >
-
-                {word}
-
-              </div>
-
-            );
-          }
-        )}
-
-      </div>
-
-    </div>
-
-  );
 }

@@ -24,7 +24,7 @@ const TRAP4_PATH = path.join(
   "trap4.json"
 );
 
-const MIN_SOLVES = 3;
+const MIN_SOLVES = 2;
 
 /*
   2 means:
@@ -110,161 +110,418 @@ for (const word of uniqueWords) {
   }
 }
 
+/*
+==========================================
+TRAP GENERATION ENGINE V2
+==========================================
+*/
+
 const trap3 = [];
 const trap4 = [];
 
-console.log(
-  "Generating traps..."
-);
+
+console.log("Generating traps...");
 
 let processed = 0;
 
-for (const word of uniqueWords) {
+function buildTrapObject(
+  word,
+  trap,
+  solveCount,
+  shortestSolve,
+  type
+){
 
-  processed++;
+  const difficulty =
+    shortestSolve -
+    trap.length;
 
-  if (
-    processed % 50000 === 0
-  ) {
+  const score =
+    difficulty * 100 -
+    solveCount;
 
-    console.log(
-      `Processed ${processed.toLocaleString()} / ${uniqueWords.length.toLocaleString()}`
+  return {
+
+    word,
+
+    trap,
+
+    type,
+
+    solveCount,
+
+    shortestSolve,
+
+    difficulty,
+
+    score
+
+  };
+
+}
+
+function registerTrap(
+    trapArray,
+    object
+){
+
+    trapArray.push(object);
+
+}
+function sortTrapGroup(group){
+
+    group.sort((a,b)=>{
+
+        if (b.score !== a.score)
+    return b.score - a.score;
+
+if (a.solveCount !== b.solveCount)
+    return a.solveCount - b.solveCount;
+
+if (a.word.length !== b.word.length)
+    return a.word.length - b.word.length;
+
+return a.word.localeCompare(b.word);
+
+    });
+
+}
+
+function distributeTrapGroups(traps){
+
+    const groups = new Map();
+
+    for(const trap of traps){
+
+        const key = `${trap.type}:${trap.trap}`;
+
+if (!groups.has(key)) {
+    groups.set(key, []);
+}
+
+groups.get(key).push(trap);
+    }
+
+    for(const group of groups.values())
+        sortTrapGroup(group);
+
+    const result=[];
+
+const queues =
+    [...groups.values()];
+
+while(queues.length){
+
+    queues.sort((a,b)=>{
+
+        if(
+            b[0].score !==
+            a[0].score
+        )
+            return (
+                b[0].score -
+                a[0].score
+            );
+
+        return (
+            a.length -
+            b.length
+        );
+
+    });
+
+    const current =
+        queues.shift();
+
+    result.push(
+        current.shift()
     );
-  }
 
-  // ------------------
-  // 3 LETTER TRAPS
-  // ------------------
+    if(current.length)
+        queues.push(current);
 
-  if (word.length >= 6) {
+}
 
-    const suffix3 =
-      word.slice(-3);
+return result;
 
-    const solves3 =
-      (prefix3Map.get(suffix3) || [])
-      .filter(
-        solve =>
-          solve !== word
-      );
+}
 
-    if (
-      solves3.length >=
-      MIN_SOLVES
-    ) {
+for(const word of uniqueWords){
 
-      const shortestSolve =
-        Math.min(
-          ...solves3.map(
-            s => s.length
-          )
+    processed++;
+
+    if(processed % 50000 === 0){
+
+        console.log(
+
+            `Processed ${processed.toLocaleString()} / ${uniqueWords.length.toLocaleString()}`
+
         );
 
-      const difficulty =
-        shortestSolve -
-        suffix3.length;
-
-      if (
-        difficulty >=
-        MIN_EXTRA_LETTERS
-      ) {
-
-        const score =
-          difficulty * 100 -
-          solves3.length;
-
-        trap3.push({
-          word,
-          suffix: suffix3,
-          solveCount:
-            solves3.length,
-          shortestSolve,
-          difficulty,
-          score
-        });
-      }
     }
-  }
 
-  // ------------------
-  // 4 LETTER TRAPS
-  // ------------------
+    /*
+    --------------------------
+    3 LETTER SUFFIX TRAP
+    --------------------------
+    */
 
-  if (word.length >= 7) {
+    if(word.length >= 6){
 
-    const suffix4 =
-      word.slice(-4);
+        const trap =
+            word.slice(-3);
 
-    const solves4 =
-      (prefix4Map.get(suffix4) || [])
-      .filter(
-        solve =>
-          solve !== word
-      );
+        const solves =
+            (prefix3Map.get(trap) || [])
+            .filter(
+                solve =>
+                    solve !== word
+            );
 
-    if (
-      solves4.length >=
-      MIN_SOLVES
-    ) {
+        if(
+            solves.length >= MIN_SOLVES
+        ){
 
-      const shortestSolve =
-        Math.min(
-          ...solves4.map(
-            s => s.length
-          )
-        );
+            const shortest =
+                Math.min(
+                    ...solves.map(
+                        s=>s.length
+                    )
+                );
 
-      const difficulty =
-        shortestSolve -
-        suffix4.length;
+            if(
+                shortest >=
+                trap.length +
+                MIN_EXTRA_LETTERS
+            ){
 
-      if (
-        difficulty >=
-        MIN_EXTRA_LETTERS
-      ) {
+                registerTrap(
 
-        const score =
-          difficulty * 100 -
-          solves4.length;
+    trap3,
 
-        trap4.push({
-          word,
-          suffix: suffix4,
-          solveCount:
-            solves4.length,
-          shortestSolve,
-          difficulty,
-          score
-        });
-      }
+                    buildTrapObject(
+
+                        word,
+
+                        trap,
+
+                        solves.length,
+
+                        shortest,
+
+                        "suffix"
+
+                    )
+
+                );
+
+            }
+
+        }
+
     }
-  }
+
+    /*
+    --------------------------
+    4 LETTER SUFFIX TRAP
+    --------------------------
+    */
+
+    if(word.length >= 7){
+
+        const trap =
+            word.slice(-4);
+
+        const solves =
+            (prefix4Map.get(trap)||[])
+            .filter(
+                solve =>
+                    solve !== word
+            );
+
+        if(
+            solves.length >= MIN_SOLVES
+        ){
+
+            const shortest =
+                Math.min(
+                    ...solves.map(
+                        s=>s.length
+                    )
+                );
+
+            if(
+                shortest >=
+                trap.length +
+                MIN_EXTRA_LETTERS
+            ){
+
+                registerTrap(
+
+    trap4,
+                    buildTrapObject(
+
+                        word,
+
+                        trap,
+
+                        solves.length,
+
+                        shortest,
+
+                        "suffix"
+
+                    )
+
+                );
+
+            }
+
+        }
+
+    }
+
+    /*
+    --------------------------
+    SELF 3 LETTER TRAP
+    --------------------------
+    */
+
+    if(word.length === 3){
+
+        const solves =
+            (prefix3Map.get(word)||[])
+            .filter(
+                solve =>
+                    solve !== word
+            );
+
+        if(
+            solves.length >=
+            MIN_SOLVES
+        ){
+
+            const shortest =
+                Math.min(
+                    ...solves.map(
+                        s=>s.length
+                    )
+                );
+
+            if(
+                shortest >=
+                word.length +
+                MIN_EXTRA_LETTERS
+            ){
+
+                registerTrap(
+
+    trap3,
+
+                    buildTrapObject(
+
+                        word,
+
+                        word,
+
+                        solves.length,
+
+                        shortest,
+
+                        "self"
+
+                    )
+
+                );
+
+            }
+
+        }
+
+    }
+
+    /*
+    --------------------------
+    SELF 4 LETTER TRAP
+    --------------------------
+    */
+
+    if(word.length === 4){
+
+        const solves =
+            (prefix4Map.get(word)||[])
+            .filter(
+                solve =>
+                    solve !== word
+            );
+
+        if(
+            solves.length >=
+            MIN_SOLVES
+        ){
+
+            const shortest =
+                Math.min(
+                    ...solves.map(
+                        s=>s.length
+                    )
+                );
+
+            if(
+                shortest >=
+                word.length +
+                MIN_EXTRA_LETTERS
+            ){
+
+                registerTrap(
+
+    trap4,
+
+                    buildTrapObject(
+
+                        word,
+
+                        word,
+
+                        solves.length,
+
+                        shortest,
+
+                        "self"
+
+                    )
+
+                );
+
+            }
+
+        }
+
+    }
+
 }
 
 console.log(
-  "Sorting traps..."
+    "Distributing trap families..."
 );
 
-trap3.sort(
-  (a, b) =>
-    b.score -
-    a.score
-);
+const finalTrap3 =
+    distributeTrapGroups(
+        trap3
+    );
 
-trap4.sort(
-  (a, b) =>
-    b.score -
-    a.score
-);
-
-console.log(
+const finalTrap4 =
+    distributeTrapGroups(
+        trap4
+    );
+    console.log(
   "Saving trap3.json..."
 );
 
 fs.writeFileSync(
   TRAP3_PATH,
   JSON.stringify(
-    trap3,
+    finalTrap3,
     null,
     2
   )
@@ -276,8 +533,8 @@ console.log(
 
 fs.writeFileSync(
   TRAP4_PATH,
-  JSON.stringify(
-    trap4,
+ JSON.stringify(
+    finalTrap4,
     null,
     2
   )
@@ -290,9 +547,9 @@ console.log(
 );
 
 console.log(
-  `3-letter traps: ${trap3.length.toLocaleString()}`
+  `3-letter traps: ${finalTrap3.length.toLocaleString()}`
 );
 
 console.log(
-  `4-letter traps: ${trap4.length.toLocaleString()}`
+  `4-letter traps: ${finalTrap4.length.toLocaleString()}`
 );
